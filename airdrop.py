@@ -5,10 +5,10 @@ from algosdk.error import WrongChecksumError
 from algosdk.future.transaction import AssetTransferTxn
 from algosdk.v2client import algod, indexer
 
+NETWORK = "testnet"
 ASSET_ID = "26713649"
 SENDER_ADDRESS = "LXJ3Q6RZ2TJ6VCJDFMSM4ZVNYYYE4KVSL3N2TYR23PLNCJCIXBM3NYTBYE"
 SENDER_PASSPHRASE = "foo" # 25 words separated by spaces
-
 
 SLEEP_INTERVAL = 1  # AlgoExplorer limit for public calls
 AIRDROP_AMOUNT = 3000
@@ -18,8 +18,10 @@ TRANSACTION_NOTE = "Airdrop"
 ## CLIENTS
 def _algod_client():
     """Instantiate and return Algod client object."""
-    # algod_address = "https://algoexplorerapi.io/"
-    algod_address = "https://testnet.algoexplorerapi.io"
+    if NETWORK == "mainnet":
+        algod_address = "https://algoexplorerapi.io"
+    else:
+        algod_address = "https://testnet.algoexplorerapi.io"
     algod_token = ""
     return algod.AlgodClient(
         algod_token, algod_address, headers={"User-Agent": "DoYouLoveMe?"}
@@ -28,8 +30,10 @@ def _algod_client():
 
 def _indexer_client():
     """Instantiate and return Indexer client object."""
-    # indexer_address = "https://algoexplorerapi.io/idx2"
-    indexer_address = "https://testnet.algoexplorerapi.io/idx2"
+    if NETWORK == "mainnet":
+        indexer_address = "https://algoexplorerapi.io/idx2"
+    else:
+        indexer_address = "https://testnet.algoexplorerapi.io/idx2"
     indexer_token = ""
     return indexer.IndexerClient(
         indexer_token, indexer_address, headers={"User-Agent": "DoYouLoveMe?"}

@@ -38,11 +38,12 @@ Now change the directory to the project root directory and install the project d
 ```
 
 
-# Running
+# Run
 
 At the top of `airdrop.py` file you may find the constants you should change:
 
 ```
+NETWORK = "testnet"
 ASSET_ID = "26713649"
 SENDER_ADDRESS = "LXJ3Q6RZ2TJ6VCJDFMSM4ZVNYYYE4KVSL3N2TYR23PLNCJCIXBM3NYTBYE"
 SENDER_PASSPHRASE = ""  # 25 words separated by spaces
