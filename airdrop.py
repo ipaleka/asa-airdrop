@@ -7,7 +7,7 @@ from algosdk.v2client import algod, indexer
 
 ASSET_ID = "26713649"
 SENDER_ADDRESS = "LXJ3Q6RZ2TJ6VCJDFMSM4ZVNYYYE4KVSL3N2TYR23PLNCJCIXBM3NYTBYE"
-SENDER_PASSPHRASE = "foo"
+SENDER_PASSPHRASE = "foo" # 25 words separated by spaces
 
 
 SLEEP_INTERVAL = 1  # AlgoExplorer limit for public calls
