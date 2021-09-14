@@ -2,12 +2,13 @@ import time
 
 from algosdk import mnemonic
 from algosdk.error import WrongChecksumError
-from algosdk.future.transaction import PaymentTxn
+from algosdk.future.transaction import AssetTransferTxn
 from algosdk.v2client import algod, indexer
 
 ASSET_ID = "26713649"
 SENDER_ADDRESS = "LXJ3Q6RZ2TJ6VCJDFMSM4ZVNYYYE4KVSL3N2TYR23PLNCJCIXBM3NYTBYE"
 SENDER_PASSPHRASE = "foo"
+
 
 SLEEP_INTERVAL = 1  # AlgoExplorer limit for public calls
 AIRDROP_AMOUNT = 3000
@@ -18,7 +19,7 @@ TRANSACTION_NOTE = "Airdrop"
 def _algod_client():
     """Instantiate and return Algod client object."""
     # algod_address = "https://algoexplorerapi.io/"
-    algod_address = "https://testnet.algoexplorerapi.io/"
+    algod_address = "https://testnet.algoexplorerapi.io"
     algod_token = ""
     return algod.AlgodClient(
         algod_token, algod_address, headers={"User-Agent": "DoYouLoveMe?"}
@@ -70,11 +71,11 @@ def address_generator():
     """Return all addresses opted-in for the asset."""
     balances = _indexer_client().asset_balances(ASSET_ID)
     while balances.get("balances"):
-        next_token = balances.get("next-token")
-        balances = _indexer_client().asset_balances(ASSET_ID, next_page=next_token)
         for item in balances.get("balances"):
             if item.get("amount") == 0:
                 yield item
+        next_token = balances.get("next-token")
+        balances = _indexer_client().asset_balances(ASSET_ID, next_page=next_token)
 
 
 def check_address(address):
@@ -92,8 +93,13 @@ def send_asset(receiver):
     params = client.suggested_params()
     note = TRANSACTION_NOTE
 
-    unsigned_txn = PaymentTxn(
-        SENDER_ADDRESS, params, receiver, AIRDROP_AMOUNT, None, note.encode()
+    unsigned_txn = AssetTransferTxn(
+        SENDER_ADDRESS,
+        params,
+        receiver,
+        AIRDROP_AMOUNT,
+        index=ASSET_ID,
+        note=note.encode(),
     )
     try:
         signed_txn = unsigned_txn.sign(mnemonic.to_private_key(SENDER_PASSPHRASE))
@@ -108,7 +114,7 @@ def send_asset(receiver):
     except Exception as err:
         return str(err)
 
-    print("Amount of {AIRDROP_AMOUNT} sent to {receiver}")
+    print(f"Amount of {AIRDROP_AMOUNT} sent to {receiver}")
     return ""
 
 
