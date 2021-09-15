@@ -47,6 +47,7 @@ NETWORK = "testnet"
 ASSET_ID = "26713649"
 SENDER_ADDRESS = "LXJ3Q6RZ2TJ6VCJDFMSM4ZVNYYYE4KVSL3N2TYR23PLNCJCIXBM3NYTBYE"
 SENDER_PASSPHRASE = ""  # 25 words separated by spaces
+VALID_BLOCK_RANGE_FOR_AIRDROP = ()  # (start, end); leave empty for all opt-ins
 
 SLEEP_INTERVAL = 1  # AlgoExplorer limit for public calls
 AIRDROP_AMOUNT = 3000

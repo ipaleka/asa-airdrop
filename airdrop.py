@@ -8,7 +8,8 @@ from algosdk.v2client import algod, indexer
 NETWORK = "testnet"
 ASSET_ID = "26713649"
 SENDER_ADDRESS = "LXJ3Q6RZ2TJ6VCJDFMSM4ZVNYYYE4KVSL3N2TYR23PLNCJCIXBM3NYTBYE"
-SENDER_PASSPHRASE = "foo" # 25 words separated by spaces
+SENDER_PASSPHRASE = "foo"  # 25 words separated by spaces
+VALID_BLOCK_RANGE_FOR_AIRDROP = ()  # (start, end); leave empty for all opt-ins
 
 SLEEP_INTERVAL = 1  # AlgoExplorer limit for public calls
 AIRDROP_AMOUNT = 3000
@@ -71,12 +72,29 @@ def _wait_for_confirmation(client, transaction_id, timeout):
     )
 
 
+def is_valid_for_airdrop(item):
+    """Return True if provided item qualifies for airdrop."""
+    if item.get("amount") != 0:
+        return False
+    if len(VALID_BLOCK_RANGE_FOR_AIRDROP) == 0:
+        return True
+    if len(VALID_BLOCK_RANGE_FOR_AIRDROP) != 2:
+        print(f"Invalid block range: {VALID_BLOCK_RANGE_FOR_AIRDROP}")
+        raise SystemExit
+    if (
+        item.get("opted-in-at-round") >= VALID_BLOCK_RANGE_FOR_AIRDROP[0]
+        and item.get("opted-in-at-round") <= VALID_BLOCK_RANGE_FOR_AIRDROP[1]
+    ):
+        return True
+    return False
+
+
 def address_generator():
     """Return all addresses opted-in for the asset."""
     balances = _indexer_client().asset_balances(ASSET_ID)
     while balances.get("balances"):
         for item in balances.get("balances"):
-            if item.get("amount") == 0:
+            if is_valid_for_airdrop(item):
                 yield item
         next_token = balances.get("next-token")
         balances = _indexer_client().asset_balances(ASSET_ID, next_page=next_token)
