@@ -21,20 +21,20 @@ $ sudo apt-get install python3-venv
 Clone the repository:
 
 ```bash
-git clone https://github.com/ipaleka/asa-airdroper.git
+git clone https://github.com/ipaleka/asa-airdrop.git
 ```
 
 As always for the Python-based projects, you should create a Python environment and activate it:
 
 ```bash
-python3 -m venv airdroper
-source airdroper/bin/activate
+python3 -m venv airdrop
+source airdrop/bin/activate
 ```
 
 Now change the directory to the project root directory and install the project dependencies with:
 
 ```bash
-(airdroper) $ pip install -r requirements.txt
+(airdrop) $ pip install -r requirements.txt
 ```
 
 
@@ -56,5 +56,5 @@ TRANSACTION_NOTE = "Airdrop"
 Save the file afterwards and run it with:
 
 ```bash
-(airdroper) $ python airdrop.py
+(airdrop) $ python airdrop.py
 ```
