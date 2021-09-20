@@ -1,6 +1,7 @@
 import time
 
 from algosdk import mnemonic
+from algosdk.constants import MICROALGOS_TO_ALGOS_RATIO
 from algosdk.error import WrongChecksumError
 from algosdk.future.transaction import AssetTransferTxn
 from algosdk.v2client import algod, indexer
@@ -8,12 +9,22 @@ from algosdk.v2client import algod, indexer
 NETWORK = "testnet"
 ASSET_ID = "26713649"
 SENDER_ADDRESS = "LXJ3Q6RZ2TJ6VCJDFMSM4ZVNYYYE4KVSL3N2TYR23PLNCJCIXBM3NYTBYE"
-SENDER_PASSPHRASE = "foo"  # 25 words separated by spaces
+SENDER_PASSPHRASE = ""  # 25 words separated by spaces
 VALID_BLOCK_RANGE_FOR_AIRDROP = ()  # (start, end); leave empty for all opt-ins
+MINIMUM_ALGO_HOLDING = None  # leave None for global minimum of 0.1
+MINIMUM_OTHER_ASA_HOLDING = 0  # leave 0 if account doesn't have to hold other ASA
 
 SLEEP_INTERVAL = 1  # AlgoExplorer limit for public calls
 AIRDROP_AMOUNT = 3000
 TRANSACTION_NOTE = "Airdrop"
+
+
+class NotQualified(Exception):
+    """Exception for addresses not passing airdrop conditions."""
+
+
+class SilentNotQualified(Exception):
+    """Silent exception for addresses not passing airdrop conditions."""
 
 
 ## CLIENTS
@@ -72,21 +83,48 @@ def _wait_for_confirmation(client, transaction_id, timeout):
     )
 
 
-def is_valid_for_airdrop(item):
-    """Return True if provided item qualifies for airdrop."""
+def check_valid_for_airdrop(item):
+    """Raise an exception if provided item doesn't qualify for airdrop."""
+
     if item.get("amount") != 0:
-        return False
-    if len(VALID_BLOCK_RANGE_FOR_AIRDROP) == 0:
-        return True
-    if len(VALID_BLOCK_RANGE_FOR_AIRDROP) != 2:
-        print(f"Invalid block range: {VALID_BLOCK_RANGE_FOR_AIRDROP}")
-        raise SystemExit
-    if (
-        item.get("opted-in-at-round") >= VALID_BLOCK_RANGE_FOR_AIRDROP[0]
-        and item.get("opted-in-at-round") <= VALID_BLOCK_RANGE_FOR_AIRDROP[1]
-    ):
-        return True
-    return False
+        raise SilentNotQualified
+
+    if MINIMUM_ALGO_HOLDING is not None or MINIMUM_OTHER_ASA_HOLDING > 0:
+        account_info = _indexer_client().account_info(item.get("address"))
+
+    if MINIMUM_ALGO_HOLDING is not None:
+        if MINIMUM_ALGO_HOLDING < 0.1:
+            print(f"Invalid mimimum Algo holding value: {MINIMUM_ALGO_HOLDING}")
+            raise SystemExit
+        if (
+            account_info.get("account").get("amount") / MICROALGOS_TO_ALGOS_RATIO
+            < MINIMUM_ALGO_HOLDING
+        ):
+            raise NotQualified
+
+    if MINIMUM_OTHER_ASA_HOLDING > 0:
+        if not isinstance(MINIMUM_OTHER_ASA_HOLDING, int):
+            print(
+                f"MINIMUM_OTHER_ASA_HOLDING is not an integer: {MINIMUM_OTHER_ASA_HOLDING}"
+            )
+            raise SystemExit
+        assets = [
+            asset
+            for asset in account_info.get("account").get("assets")
+            if asset.get("amount") > 0
+        ]
+        if len(assets) < MINIMUM_OTHER_ASA_HOLDING:
+            raise NotQualified
+
+    if len(VALID_BLOCK_RANGE_FOR_AIRDROP) != 0:
+        if len(VALID_BLOCK_RANGE_FOR_AIRDROP) != 2:
+            print(f"Invalid block range: {VALID_BLOCK_RANGE_FOR_AIRDROP}")
+            raise SystemExit
+        if len(VALID_BLOCK_RANGE_FOR_AIRDROP) == 2 and (
+            item.get("opted-in-at-round") < VALID_BLOCK_RANGE_FOR_AIRDROP[0]
+            or item.get("opted-in-at-round") > VALID_BLOCK_RANGE_FOR_AIRDROP[1]
+        ):
+            raise NotQualified
 
 
 def address_generator():
@@ -94,8 +132,17 @@ def address_generator():
     balances = _indexer_client().asset_balances(ASSET_ID)
     while balances.get("balances"):
         for item in balances.get("balances"):
-            if is_valid_for_airdrop(item):
+            try:
+                check_valid_for_airdrop(item)
                 yield item
+            except NotQualified:
+                print(
+                    "Address {} is not qualified for airdrop".format(
+                        item.get("address")
+                    )
+                )
+            except SilentNotQualified:
+                pass
         next_token = balances.get("next-token")
         balances = _indexer_client().asset_balances(ASSET_ID, next_page=next_token)
 
