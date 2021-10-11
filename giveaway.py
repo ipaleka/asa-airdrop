@@ -1,6 +1,7 @@
 import time
 
 from algosdk import mnemonic
+from algosdk.constants import MICROALGOS_TO_ALGOS_RATIO
 from algosdk.encoding import is_valid_address
 from algosdk.error import WrongChecksumError
 from algosdk.future.transaction import AssetTransferTxn
@@ -12,7 +13,7 @@ SENDER_ADDRESS = "5VLMDLOFA4BDSNU5QRUBISQCQJYHF5Q2HTXINUS62UNIDXWP5LJ4MHHOUY"
 SENDER_PASSPHRASE = ""  # 25 words separated by spaces
 
 SLEEP_INTERVAL = 1  # AlgoExplorer limit for public calls
-GIVEAWAY_AMOUNT = 1000
+GIVEAWAY_AMOUNT = 1000 * MICROALGOS_TO_ALGOS_RATIO  # this is for 6 decimals assets
 TRANSACTION_NOTE = "Giveaway"
 FILENAME = "addresses.txt"
 

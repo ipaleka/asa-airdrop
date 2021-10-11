@@ -15,7 +15,7 @@ MINIMUM_ALGO_HOLDING = None  # leave None for global minimum of 0.1
 MINIMUM_OTHER_ASA_HOLDING = 0  # leave 0 if account doesn't have to hold other ASA
 
 SLEEP_INTERVAL = 1  # AlgoExplorer limit for public calls
-AIRDROP_AMOUNT = 3000
+AIRDROP_AMOUNT = 3000 * MICROALGOS_TO_ALGOS_RATIO  # this is for 6 decimals assets
 TRANSACTION_NOTE = "Airdrop"
 
 
