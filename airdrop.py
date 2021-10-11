@@ -8,14 +8,14 @@ from algosdk.v2client import algod, indexer
 
 NETWORK = "testnet"
 ASSET_ID = "26713649"
-SENDER_ADDRESS = "LXJ3Q6RZ2TJ6VCJDFMSM4ZVNYYYE4KVSL3N2TYR23PLNCJCIXBM3NYTBYE"
+SENDER_ADDRESS = "5VLMDLOFA4BDSNU5QRUBISQCQJYHF5Q2HTXINUS62UNIDXWP5LJ4MHHOUY"
 SENDER_PASSPHRASE = ""  # 25 words separated by spaces
 VALID_BLOCK_RANGE_FOR_AIRDROP = ()  # (start, end); leave empty for all opt-ins
 MINIMUM_ALGO_HOLDING = None  # leave None for global minimum of 0.1
 MINIMUM_OTHER_ASA_HOLDING = 0  # leave 0 if account doesn't have to hold other ASA
 
 SLEEP_INTERVAL = 1  # AlgoExplorer limit for public calls
-AIRDROP_AMOUNT = 3000 * MICROALGOS_TO_ALGOS_RATIO  # this is for 6 decimals assets
+AIRDROP_AMOUNT = 3000
 TRANSACTION_NOTE = "Airdrop"
 
 
@@ -162,11 +162,14 @@ def send_asset(receiver):
     params = client.suggested_params()
     note = TRANSACTION_NOTE
 
+    decimals = _algod_client().asset_info(ASSET_ID).get("params").get("decimals")
+    amount = AIRDROP_AMOUNT * (10 ** decimals)
+
     unsigned_txn = AssetTransferTxn(
         SENDER_ADDRESS,
         params,
         receiver,
-        AIRDROP_AMOUNT,
+        amount,
         index=ASSET_ID,
         note=note.encode(),
     )
