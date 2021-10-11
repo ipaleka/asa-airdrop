@@ -8,7 +8,7 @@ from algosdk.v2client import algod, indexer
 
 NETWORK = "testnet"
 ASSET_ID = "26713649"
-SENDER_ADDRESS = "LXJ3Q6RZ2TJ6VCJDFMSM4ZVNYYYE4KVSL3N2TYR23PLNCJCIXBM3NYTBYE"
+SENDER_ADDRESS = "5VLMDLOFA4BDSNU5QRUBISQCQJYHF5Q2HTXINUS62UNIDXWP5LJ4MHHOUY"
 SENDER_PASSPHRASE = ""  # 25 words separated by spaces
 
 SLEEP_INTERVAL = 1  # AlgoExplorer limit for public calls
@@ -76,11 +76,10 @@ def _wait_for_confirmation(client, transaction_id, timeout):
 def address_generator():
     """Return all addresses for giveaway from a file."""
     with open(FILENAME, "r") as addresses:
-        address = addresses.readline().strip()
-        while address:
+        for line in addresses:
+            address = line.strip()
             if is_valid_address(address):
                 yield address
-            address = addresses.readline().strip()
 
 
 def check_address(address):
