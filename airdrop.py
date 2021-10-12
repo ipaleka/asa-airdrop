@@ -13,6 +13,7 @@ SENDER_PASSPHRASE = ""  # 25 words separated by spaces
 VALID_BLOCK_RANGE_FOR_AIRDROP = ()  # (start, end); leave empty for all opt-ins
 MINIMUM_ALGO_HOLDING = None  # leave None for global minimum of 0.1
 MINIMUM_OTHER_ASA_HOLDING = 0  # leave 0 if account doesn't have to hold other ASA
+ASSET_HOLDERS_INCLUDED = False  # set to True if ASA holders are eligible for airdrop
 
 SLEEP_INTERVAL = 1  # AlgoExplorer limit for public calls
 AIRDROP_AMOUNT = 3000
@@ -86,7 +87,7 @@ def _wait_for_confirmation(client, transaction_id, timeout):
 def check_valid_for_airdrop(item):
     """Raise an exception if provided item doesn't qualify for airdrop."""
 
-    if item.get("amount") != 0:
+    if not ASSET_HOLDERS_INCLUDED and item.get("amount") != 0:
         raise SilentNotQualified
 
     if MINIMUM_ALGO_HOLDING is not None or MINIMUM_OTHER_ASA_HOLDING > 0:
@@ -195,7 +196,7 @@ if __name__ == "__main__":
     for item in address_generator():
         address = item.get("address")
         time.sleep(SLEEP_INTERVAL)
-        if check_address(address):
+        if ASSET_HOLDERS_INCLUDED or check_address(address):
             time.sleep(SLEEP_INTERVAL)
             response = send_asset(address)
             if response != "":

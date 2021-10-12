@@ -50,6 +50,7 @@ SENDER_PASSPHRASE = ""  # 25 words separated by spaces
 VALID_BLOCK_RANGE_FOR_AIRDROP = ()  # (start, end); leave empty for all opt-ins
 MINIMUM_ALGO_HOLDING = None  # leave None for global minimum of 0.1
 MINIMUM_OTHER_ASA_HOLDING = 0  # leave 0 if account doesn't have to hold other ASA
+ASSET_HOLDERS_INCLUDED = False  # set to True if ASA holders are eligible for airdrop
 
 SLEEP_INTERVAL = 1  # AlgoExplorer limit for public calls
 AIRDROP_AMOUNT = 3000
