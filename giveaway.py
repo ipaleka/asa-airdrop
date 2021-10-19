@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 
 from algosdk import mnemonic
 from algosdk.encoding import is_valid_address
@@ -127,6 +128,7 @@ def send_asset(receiver):
 
 if __name__ == "__main__":
 
+    giveaway_filename = "not_opted_in_{}.txt".format(datetime.now().strftime("%Y-%m-%d-%H:%M:%S"))
     for address in address_generator():
         time.sleep(SLEEP_INTERVAL)
         if check_address(address):
@@ -135,3 +137,6 @@ if __name__ == "__main__":
             if response != "":
                 print(f"Error: {response}")
                 raise SystemExit
+        else:
+            with open(giveaway_filename, "a") as not_opted_in:
+                not_opted_in.write(f"{address}\n")
