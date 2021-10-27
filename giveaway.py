@@ -128,15 +128,19 @@ def send_asset(receiver):
 
 if __name__ == "__main__":
 
-    giveaway_filename = "not_opted_in_{}.txt".format(datetime.now().strftime("%Y-%m-%d-%H:%M:%S"))
+    formatted_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+
+    error_filename = "error_{}.txt".format(formatted_time)
+    not_opted_in_filename = "not_opted_in_{}.txt".format(formatted_time)
+
     for address in address_generator():
         time.sleep(SLEEP_INTERVAL)
         if check_address(address):
             time.sleep(SLEEP_INTERVAL)
             response = send_asset(address)
             if response != "":
-                print(f"Error: {response}")
-                raise SystemExit
+                with open(error_filename, "a") as error:
+                    error.write(f"{response}\n")
         else:
-            with open(giveaway_filename, "a") as not_opted_in:
+            with open(not_opted_in_filename, "a") as not_opted_in:
                 not_opted_in.write(f"{address}\n")

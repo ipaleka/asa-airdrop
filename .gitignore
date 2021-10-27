@@ -4,3 +4,4 @@ __pycache__
 .pytest_cache
 *.code-workspace
 not_opted_in_*.txt
+error_*.txt
