@@ -164,7 +164,7 @@ def send_asset(receiver):
     note = TRANSACTION_NOTE
 
     decimals = _algod_client().asset_info(ASSET_ID).get("params").get("decimals")
-    amount = AIRDROP_AMOUNT * (10 ** decimals)
+    amount = int(AIRDROP_AMOUNT * (10 ** decimals))
 
     unsigned_txn = AssetTransferTxn(
         SENDER_ADDRESS,
